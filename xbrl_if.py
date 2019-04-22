@@ -35,17 +35,16 @@ def rename(folder_path):
     for filename in file_list:
         fn = filename.strip(folder_path)
         d_lst = [s for s in re.split('[-_.]', fn) if s.isdigit()]
-        st = d_lst[2]+d_lst[3]+d_lst[4]
-        ed = d_lst[6]+d_lst[7]+d_lst[8]
-        
+        st = d_lst[2][2:]+d_lst[3]+d_lst[4]
+
         if ("asr" in filename):
-            os.rename(filename, (folder_path+"/"+st+"-"+ed+"-q4"+".xbrl") )
+            os.rename(filename, (folder_path+"/"+st+"-q4"+".xbrl") )
         elif ("q1r" in filename):
-            os.rename(filename, (folder_path+"/"+st+"-"+ed+"-q1"+".xbrl") )
+            os.rename(filename, (folder_path+"/"+st+"-q1"+".xbrl") )
         elif ("q2r" in filename):
-            os.rename(filename, (folder_path+"/"+st+"-"+ed+"-q2"+".xbrl") )
+            os.rename(filename, (folder_path+"/"+st+"-q2"+".xbrl") )
         elif ("q3r" in filename):
-            os.rename(filename, (folder_path+"/"+st+"-"+ed+"-q3"+".xbrl") )
+            os.rename(filename, (folder_path+"/"+st+"-q3"+".xbrl") )
         else:
             os.remove(filename)
         print(filename)
@@ -166,10 +165,11 @@ def parse(dir, ticker):
     #context_ref ="FilingDateInstant"
 
 
-def visualize(ticker, df, save_dir):
+def visualize_individually(ticker, df, save_dir):
+    i = 0
     for column in df.columns:
         if column != "txt":
-            fig_name = ticker+'_'+column+'.png'
+            fig_name = str(i) + column+'.png'
             plt.figure()
             
 #            push_text(user_id, "--"+column+"--")
@@ -179,6 +179,43 @@ def visualize(ticker, df, save_dir):
             plt.xticks(rotation=90)
             plt.savefig(save_dir+'/'+fig_name)
             fig = open(save_dir+'/'+fig_name, 'rb')
+            i = i + 1
+
+def visualize(ticker, df, save_dir):
+    df = df.set_index('txt')
+    df_ = df/1000000
+
+    h = 12
+    w = 8
+
+    plt.figure()
+    fig_name = '0_Sales.png'
+    df_.plot.bar(y=['Sales'], alpha=0.6, figsize=(h,w))
+    plt.xlabel('Quarter')
+    plt.ylabel('[MillionJPY]')
+    plt.savefig(save_dir+'/'+fig_name)
+
+    fig_name = '1_OpeIncm_OdnIncm.png'
+    plt.savefig(save_dir+'/'+fig_name)
+    df_.plot.bar(y=['OperatingIncome', 'OrdinaryIncome'], alpha=0.6, figsize=(h,w))
+    plt.xlabel('Quarter')
+    plt.ylabel('[MillionJPY]')
+    plt.savefig(save_dir+'/'+fig_name)
+
+    fig_name = '2_Assets.png'
+    plt.savefig(save_dir+'/'+fig_name)
+    df_.plot.bar(y=['CurrentAssets', 'FixedAssets', 'CurrentLiabilities', 'FixedLiabilities'], alpha=0.6, figsize=(h,w))
+    plt.xlabel('Quarter')
+    plt.ylabel('[MillionJPY]')
+    plt.savefig(save_dir+'/'+fig_name)
+
+    fig_name = '3_CF.png'
+    plt.savefig(save_dir+'/'+fig_name)
+    df_.plot.bar(y=['SalesCF', 'InvestmentCF', 'FinanceCF'], alpha=0.6, figsize=(h,w))
+    plt.xlabel('Quarter')
+    plt.ylabel('[MillionJPY]')
+    plt.savefig(save_dir+'/'+fig_name)
+
 
 if __name__ == '__main__':
     TICKER = "6550"
