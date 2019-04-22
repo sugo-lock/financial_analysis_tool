@@ -35,7 +35,7 @@ def rename(folder_path):
     for filename in file_list:
         fn = filename.strip(folder_path)
         d_lst = [s for s in re.split('[-_.]', fn) if s.isdigit()]
-        st = d_lst[2][2:]+d_lst[3]+d_lst[4]
+        st = d_lst[2]+d_lst[3]+d_lst[4]
 
         if ("asr" in filename):
             os.rename(filename, (folder_path+"/"+st+"-q4"+".xbrl") )
@@ -218,7 +218,7 @@ def visualize(ticker, df, save_dir):
 
 
 if __name__ == '__main__':
-    TICKER = "6550"
+    TICKER = "5218"
     DL_DIR = 'tmp'
     
     download(TICKER, DL_DIR)
